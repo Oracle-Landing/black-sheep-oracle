@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ทดสอบขับรถใบขับขี่ — Black_Sheep Oracle</title>
+    <title>🚗 DLT Driving Test 3D — Black_Sheep Oracle</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
         * {
@@ -15,43 +15,28 @@
             box-sizing: border-box
         }
 
-        :root {
-            --bg: #0d1117;
-            --panel: rgba(22, 27, 34, 0.92);
-            --accent: #00ff88;
-            --warn: #ffd700;
-            --danger: #ff4444;
-            --text: #e6edf3;
-            --muted: #8b949e;
-            --border: rgba(0, 255, 136, 0.2);
+        body {
+            background: #0d1117;
+            overflow: hidden;
+            font-family: 'Noto Sans Thai', sans-serif;
+            color: #e6edf3
         }
 
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Noto Sans Thai', sans-serif;
-            overflow: hidden;
+        #c {
+            display: block;
+            width: 100vw;
             height: 100vh
         }
 
-        #canvas {
-            display: block;
-            width: 100%;
-            height: 100%
-        }
-
-        /* HUD */
+        /* ── HUD ── */
         #hud {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             pointer-events: none;
-            z-index: 10
+            z-index: 20
         }
 
-        /* Top bar */
+        /* top bar */
         #topbar {
             position: absolute;
             top: 0;
@@ -60,853 +45,773 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: .75rem 1.5rem;
-            background: rgba(13, 17, 23, 0.85);
+            padding: .6rem 1.5rem;
+            background: rgba(13, 17, 23, .85);
             backdrop-filter: blur(8px);
-            border-bottom: 1px solid var(--border);
-            pointer-events: auto
+            border-bottom: 1px solid rgba(0, 255, 136, .15)
         }
 
         .logo {
             font-family: 'JetBrains Mono', monospace;
-            font-size: .9rem;
-            color: var(--accent);
+            font-size: .85rem;
+            color: #00ff88;
             font-weight: 700
         }
 
-        #scenario-label {
+        #sc-label {
             font-size: .85rem;
-            color: var(--warn);
+            color: #ffd700;
             font-weight: 600;
-            letter-spacing: 1px
+            letter-spacing: .5px
         }
 
-        #score-badge {
+        #score-box {
             font-family: 'JetBrains Mono', monospace;
-            font-size: .85rem;
-            background: rgba(0, 255, 136, .1);
-            border: 1px solid var(--border);
-            padding: .25rem .75rem;
+            font-size: .82rem;
+            background: rgba(0, 255, 136, .08);
+            border: 1px solid rgba(0, 255, 136, .25);
+            padding: .22rem .75rem;
             border-radius: 100px;
-            color: var(--accent)
+            color: #00ff88
         }
 
-        /* Speed & controls panel */
-        #left-panel {
+        /* telemetry */
+        #tel {
             position: absolute;
             left: 1rem;
-            top: 5rem;
-            background: var(--panel);
-            border: 1px solid var(--border);
+            top: 4.5rem;
+            background: rgba(22, 27, 34, .9);
+            border: 1px solid rgba(0, 255, 136, .2);
             border-radius: 12px;
-            padding: 1rem;
-            width: 160px;
+            padding: .9rem;
+            width: 148px;
             backdrop-filter: blur(8px)
         }
 
-        .panel-title {
+        .pan-title {
             font-family: 'JetBrains Mono', monospace;
-            font-size: .65rem;
-            color: var(--muted);
+            font-size: .6rem;
+            color: #8b949e;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: .5rem
+            margin-bottom: .4rem
         }
 
-        .metric {
-            margin-bottom: .75rem
+        .met {
+            margin-bottom: .6rem
         }
 
-        .metric-val {
+        .met-val {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
-            color: var(--accent)
+            color: #00ff88
         }
 
-        .metric-label {
-            font-size: .7rem;
-            color: var(--muted)
+        .met-lbl {
+            font-size: .65rem;
+            color: #8b949e
         }
 
-        .gear-badge {
+        .gear {
             display: inline-block;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            background: rgba(0, 255, 136, 0.15);
-            border: 1px solid var(--accent);
-            border-radius: 8px;
-            padding: .2rem .6rem;
-            color: var(--accent);
-            margin-top: .25rem
+            background: rgba(0, 255, 136, .12);
+            border: 1px solid #00ff88;
+            border-radius: 7px;
+            padding: .15rem .5rem;
+            color: #00ff88
         }
 
-        /* Controls hint */
-        #controls-hint {
+        /* controls */
+        #ctrl {
             position: absolute;
             right: 1rem;
-            top: 5rem;
-            background: var(--panel);
-            border: 1px solid var(--border);
+            top: 4.5rem;
+            background: rgba(22, 27, 34, .9);
+            border: 1px solid rgba(0, 255, 136, .2);
             border-radius: 12px;
-            padding: 1rem;
-            width: 180px;
+            padding: .9rem;
+            width: 170px;
             backdrop-filter: blur(8px);
-            font-size: .8rem
+            font-size: .76rem
         }
 
-        .key-row {
+        .krow {
             display: flex;
             align-items: center;
-            gap: .5rem;
-            margin-bottom: .4rem;
-            color: var(--muted)
+            gap: .4rem;
+            margin-bottom: .35rem;
+            color: #8b949e
         }
 
-        .key {
-            background: rgba(255, 255, 255, 0.1);
+        .k {
+            background: rgba(255, 255, 255, .1);
             border: 1px solid rgba(255, 255, 255, .2);
             border-radius: 4px;
-            padding: .1rem .4rem;
+            padding: .08rem .38rem;
             font-family: 'JetBrains Mono', monospace;
-            font-size: .75rem;
-            color: var(--text)
+            font-size: .7rem;
+            color: #e6edf3;
+            white-space: nowrap
         }
 
-        /* Message overlay */
-        #msg-overlay {
+        /* banner */
+        #banner {
             position: absolute;
-            top: 50%;
+            top: 4.5rem;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem 3rem;
-            text-align: center;
-            backdrop-filter: blur(16px);
-            display: none;
-            pointer-events: auto;
-            min-width: 320px
-        }
-
-        #msg-overlay.show {
-            display: block;
-            animation: fadeIn .3s ease
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -60%)
-            }
-
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%)
-            }
-        }
-
-        #msg-title {
-            font-size: 2rem;
+            transform: translateX(-50%);
+            padding: .55rem 1.8rem;
+            border-radius: 100px;
             font-weight: 700;
-            margin-bottom: .5rem
+            font-size: 1rem;
+            display: none;
+            white-space: nowrap
         }
 
-        #msg-body {
-            color: var(--muted);
-            font-size: .95rem;
+        #banner.pass {
+            background: rgba(0, 255, 136, .18);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            display: block
+        }
+
+        #banner.fail {
+            background: rgba(255, 68, 68, .18);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            display: block
+        }
+
+        /* overlay */
+        #ov {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, .55);
+            backdrop-filter: blur(6px);
+            pointer-events: auto
+        }
+
+        #ov.hide {
+            display: none
+        }
+
+        .card {
+            background: rgba(22, 27, 34, .95);
+            border: 1px solid rgba(0, 255, 136, .25);
+            border-radius: 18px;
+            padding: 2rem 2.5rem;
+            text-align: center;
+            min-width: 300px;
+            backdrop-filter: blur(12px);
+            max-width: 420px
+        }
+
+        .card h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: .4rem
+        }
+
+        .card p {
+            color: #8b949e;
+            font-size: .9rem;
             margin-bottom: 1.5rem;
-            line-height: 1.7
+            line-height: 1.75;
+            white-space: pre-line
         }
 
-        .btn-game {
-            padding: .65rem 1.5rem;
+        .btn {
+            padding: .6rem 1.4rem;
             border-radius: 8px;
             border: none;
             cursor: pointer;
-            font-size: .95rem;
+            font-size: .9rem;
             font-family: 'Noto Sans Thai', sans-serif;
             margin: .25rem;
             transition: all .2s;
             pointer-events: auto
         }
 
-        .btn-primary {
+        .bp {
             background: linear-gradient(135deg, #6e40c9, #00ff88);
             color: #000;
             font-weight: 700
         }
 
-        .btn-primary:hover {
+        .bp:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 255, 136, .4)
+            box-shadow: 0 6px 20px rgba(0, 255, 136, .35)
         }
 
-        .btn-secondary {
+        .bs {
             background: transparent;
-            color: var(--muted);
-            border: 1px solid var(--border)
+            color: #8b949e;
+            border: 1px solid rgba(255, 255, 255, .15)
         }
 
-        .btn-secondary:hover {
-            color: var(--text)
+        .bs:hover {
+            color: #e6edf3
         }
 
-        /* Progress dots */
-        #scenario-dots {
+        /* progress dots */
+        #dots {
             position: absolute;
-            bottom: 1.5rem;
+            bottom: 1.2rem;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: .75rem
+            gap: .6rem
         }
 
         .dot {
-            width: 12px;
-            height: 12px;
+            width: 11px;
+            height: 11px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, .2);
+            background: rgba(255, 255, 255, .15);
             transition: all .3s
         }
 
-        .dot.active {
-            background: var(--accent);
-            box-shadow: 0 0 10px var(--accent)
+        .dot.on {
+            background: #00ff88;
+            box-shadow: 0 0 8px #00ff88
         }
 
-        .dot.done {
+        .dot.dn {
             background: #6e40c9
         }
 
-        /* Result banner */
-        #result-banner {
+        /* gear counter badge */
+        #gc-badge {
             position: absolute;
-            top: 5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: .65rem 2rem;
-            border-radius: 100px;
-            font-weight: 700;
-            font-size: 1.1rem;
+            right: 1rem;
+            bottom: 5rem;
+            background: rgba(22, 27, 34, .9);
+            border: 1px solid rgba(244, 114, 182, .3);
+            border-radius: 10px;
+            padding: .5rem .9rem;
             display: none;
-            animation: slideIn .4s ease
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                top: 4rem
-            }
-
-            to {
-                opacity: 1;
-                top: 5rem
-            }
-        }
-
-        #result-banner.pass {
-            background: rgba(0, 255, 136, .2);
-            border: 1px solid var(--accent);
-            color: var(--accent)
-        }
-
-        #result-banner.fail {
-            background: rgba(255, 68, 68, .2);
-            border: 1px solid var(--danger);
-            color: var(--danger)
-        }
-
-        #result-banner.show {
-            display: block
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8rem
         }
     </style>
 </head>
 
 <body>
-    <canvas id="canvas"></canvas>
+    <canvas id="c"></canvas>
 
     <div id="hud">
-        <!-- Top Bar -->
         <div id="topbar">
-            <div class="logo">🐑 Black_Sheep — DLT Test</div>
-            <div id="scenario-label">เลือกท่าทดสอบ</div>
-            <div id="score-badge">คะแนน: <span id="score-val">100</span></div>
+            <div class="logo">🐑 Black_Sheep — DLT 3D</div>
+            <div id="sc-label">เลือกท่าทดสอบ</div>
+            <div id="score-box">Score: <span id="sv">100</span></div>
         </div>
 
-        <!-- Left panel -->
-        <div id="left-panel">
-            <div class="panel-title">Telemetry</div>
-            <div class="metric">
-                <div class="metric-val"><span id="speed-val">0</span></div>
-                <div class="metric-label">km/h</div>
+        <div id="tel">
+            <div class="pan-title">Telemetry</div>
+            <div class="met">
+                <div class="met-val"><span id="spd">0</span></div>
+                <div class="met-lbl">km/h</div>
             </div>
-            <div class="metric">
-                <div class="gear-badge" id="gear-val">P</div>
-                <div class="metric-label">เกียร์</div>
+            <div class="met">
+                <div class="gear" id="gr">P</div>
+                <div class="met-lbl">เกียร์</div>
             </div>
-            <div class="metric">
-                <div class="metric-val" style="font-size:1rem;color:var(--warn)" id="penalty-val">0</div>
-                <div class="metric-label">จุดหัก</div>
+            <div class="met">
+                <div class="met-val" style="font-size:1rem;color:#ffd700" id="pen">0</div>
+                <div class="met-lbl">จุดหัก</div>
             </div>
         </div>
 
-        <!-- Controls -->
-        <div id="controls-hint">
-            <div class="panel-title" style="margin-bottom:.75rem">Controls</div>
-            <div class="key-row"><span class="key">W</span> หรือ <span class="key">↑</span> เดินหน้า</div>
-            <div class="key-row"><span class="key">S</span> หรือ <span class="key">↓</span> ถอยหลัง</div>
-            <div class="key-row"><span class="key">A</span> <span class="key">D</span> เลี้ยว</div>
-            <div class="key-row"><span class="key">Space</span> เบรก</div>
-            <div class="key-row"><span class="key">R</span> Reset</div>
+        <div id="ctrl">
+            <div class="pan-title" style="margin-bottom:.6rem">Controls</div>
+            <div class="krow"><span class="k">W</span>/<span class="k">↑</span> เดินหน้า</div>
+            <div class="krow"><span class="k">S</span>/<span class="k">↓</span> ถอยหลัง</div>
+            <div class="krow"><span class="k">A</span><span class="k">D</span> เลี้ยว</div>
+            <div class="krow"><span class="k">Space</span> เบรก</div>
+            <div class="krow"><span class="k">R</span> Reset</div>
+            <div class="krow"><span class="k">C</span> สลับกล้อง</div>
         </div>
 
-        <!-- Result Banner -->
-        <div id="result-banner"></div>
-
-        <!-- Message Overlay -->
-        <div id="msg-overlay" class="show">
-            <div id="msg-title">🐑 DLT Driving Test</div>
-            <div id="msg-body">เลือกท่าทดสอบที่ต้องการฝึก<br>ตามมาตรฐานกรมการขนส่งทางบก</div>
-            <button class="btn-game btn-primary" onclick="startScenario(0)">🟩 ท่า 1: ขับตรง-ถอยตรง</button><br>
-            <button class="btn-game btn-primary" onclick="startScenario(1)">🟦 ท่า 2: หยุดเทียบทางเท้า</button><br>
-            <button class="btn-game btn-primary" onclick="startScenario(2)">🟥 ท่า 3: ถอยเข้าซอง</button>
-        </div>
-
-        <!-- Scenario progress -->
-        <div id="scenario-dots">
-            <div class="dot" id="dot-0"></div>
-            <div class="dot" id="dot-1"></div>
-            <div class="dot" id="dot-2"></div>
+        <div id="banner"></div>
+        <div id="gc-badge">เกียร์: <span id="gc">0</span>/7</div>
+        <div id="dots">
+            <div class="dot" id="d0"></div>
+            <div class="dot" id="d1"></div>
+            <div class="dot" id="d2"></div>
         </div>
     </div>
 
-    <script>
-        // ═══════════════════════════════════════════════════════════
-        // BLACK_SHEEP DLT DRIVING TEST — 3D Canvas Game
-        // ═══════════════════════════════════════════════════════════
+    <!-- MENU OVERLAY -->
+    <div id="ov">
+        <div class="card">
+            <h2 style="color:#00ff88">🚗 DLT Driving Test 3D</h2>
+            <p>เลือกท่าทดสอบตามมาตรฐานกรมการขนส่งทางบก</p>
+            <button class="btn bp" onclick="go(0)">🟩 ท่า 1: ขับตรง-ถอยตรง</button><br>
+            <button class="btn bp" onclick="go(1)">🟦 ท่า 2: หยุดเทียบทางเท้า</button><br>
+            <button class="btn bp" onclick="go(2)">🟥 ท่า 3: ถอยเข้าซอง</button>
+        </div>
+    </div>
 
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+    <script
+        type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+    <script type="module">
+        import * as THREE from 'three';
 
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        resize(); window.addEventListener('resize', resize);
+        const W = () => window.innerWidth, H = () => window.innerHeight;
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+        renderer.setPixelRatio(devicePixelRatio);
+        renderer.setSize(W(), H());
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 0.9;
 
-        // ── STATE ──
-        const state = {
-            scenario: -1,
-            phase: 'menu', // menu, playing, result
-            score: 100,
-            penalties: 0,
-            scenarioDone: [false, false, false],
-        };
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.Fog(0x0d1117, 30, 120);
+
+        const camera = new THREE.PerspectiveCamera(70, W() / H(), 0.1, 200);
+        window.addEventListener('resize', () => { renderer.setSize(W(), H()); camera.aspect = W() / H(); camera.updateProjectionMatrix(); });
+
+        // ── LIGHTS ──
+        scene.add(new THREE.AmbientLight(0x8899cc, 0.6));
+        const sun = new THREE.DirectionalLight(0xffeedd, 1.2);
+        sun.position.set(20, 30, 20); sun.castShadow = true;
+        sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.near = 0.5;
+        sun.shadow.camera.far = 120; sun.shadow.camera.left = -40; sun.shadow.camera.right = 40;
+        sun.shadow.camera.top = 40; sun.shadow.camera.bottom = -40;
+        scene.add(sun);
+        const fill = new THREE.DirectionalLight(0x4488ff, 0.3);
+        fill.position.set(-10, 10, -10); scene.add(fill);
+
+        // ── SKY ──
+        const skyGeo = new THREE.SphereGeometry(150, 16, 8);
+        const skyMat = new THREE.MeshBasicMaterial({
+            color: 0x0d1117, side: THREE.BackSide
+        });
+        scene.add(new THREE.Mesh(skyGeo, skyMat));
+        // Horizon glow
+        const horizonGeo = new THREE.CylinderGeometry(148, 148, 20, 32, 1, true);
+        const horizonMat = new THREE.ShaderMaterial({
+            side: THREE.BackSide, transparent: true,
+            vertexShader: `varying float vY;void main(){vY=position.y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+            fragmentShader: `varying float vY;void main(){float t=clamp((vY+10.)/20.,0.,1.);
+        vec3 c=mix(vec3(0.04,0.06,0.16),vec3(0.1,0.05,0.2),t);gl_FragColor=vec4(c,0.6);}`
+        });
+        scene.add(new THREE.Mesh(horizonGeo, horizonMat));
+
+        // Stars
+        {
+            const sg = new THREE.BufferGeometry(); const sv = [];
+            for (let i = 0; i < 600; i++) { sv.push((Math.random() - .5) * 280, Math.random() * 80 + 20, (Math.random() - .5) * 280); }
+            sg.setAttribute('position', new THREE.Float32BufferAttribute(sv, 3));
+            scene.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: .4, sizeAttenuation: true })));
+        }
+
+        // ── MATERIALS ──
+        const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x1a2030, roughness: .9, metalness: 0 });
+        const curbMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: .8 });
+        const lineMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .5 });
+        const yellowMat = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0x332200, roughness: .5 });
+        const greenMat = new THREE.MeshStandardMaterial({ color: 0x00ff88, emissive: 0x003322, roughness: .5, metalness: .1 });
+        const redMat = new THREE.MeshStandardMaterial({ color: 0xff4444, emissive: 0x330000, roughness: .5 });
+        const pinkMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, emissive: 0x330022, roughness: .5, metalness: .1 });
+        const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x4488aa, transparent: true, opacity: .35, roughness: .1, metalness: .5 });
+
+        // ── HELPERS ──
+        function box(w, h, d, mat, rx = 0, ry = 0, rz = 0) {
+            const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+            m.rotation.set(rx, ry, rz); m.castShadow = true; m.receiveShadow = true; return m;
+        }
+        function addAt(mesh, x, y, z, parent = scene) { mesh.position.set(x, y, z); parent.add(mesh); }
 
         // ── CAR ──
+        const carGroup = new THREE.Group();
+        // Body
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1e1e2e, metalness: .8, roughness: .2 });
+        const accentMat = new THREE.MeshStandardMaterial({ color: 0x6e40c9, emissive: 0x2d1a66, metalness: .7, roughness: .2 });
+        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: .8, metalness: .3 });
+        const rimMat = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: .9, roughness: .1 });
+        const lightMat = new THREE.MeshStandardMaterial({ color: 0xffffcc, emissive: 0xffffcc, emissiveIntensity: 1.5 });
+        const brakeMatOff = new THREE.MeshStandardMaterial({ color: 0x550000, roughness: .5 });
+        const brakeMat = new THREE.MeshStandardMaterial({ color: 0xff2222, emissive: 0xff0000, emissiveIntensity: 1.5 });
+
+        // Main body
+        const bodyLow = box(1.6, .5, 3.4, bodyMat); bodyLow.position.y = .35; carGroup.add(bodyLow);
+        const bodyHigh = box(1.3, .5, 2, bodyMat); bodyHigh.position.set(0, .85, -.1); carGroup.add(bodyHigh);
+        // Accent stripe
+        const stripe = box(1.62, .08, 3.42, accentMat); stripe.position.set(0, .61, 0); carGroup.add(stripe);
+        // Windshield
+        const windsh = box(1.18, .38, 0.05, glassMat); windsh.position.set(0, 1.0, .85);
+        windsh.rotation.x = THREE.MathUtils.degToRad(20); carGroup.add(windsh);
+        const rearWin = box(1.18, .32, 0.05, glassMat); rearWin.position.set(0, .95, -.95);
+        rearWin.rotation.x = THREE.MathUtils.degToRad(-15); carGroup.add(rearWin);
+        // Headlights
+        const headL = box(.25, .12, .08, lightMat); addAt(headL, -.65, .45, 1.72, carGroup);
+        const headR = box(.25, .12, .08, lightMat); addAt(headR, .65, .45, 1.72, carGroup);
+        // Brake lights
+        const brakeL = box(.28, .12, .06, brakeMatOff); brakeL._isBrake = true; addAt(brakeL, -.62, .45, -1.72, carGroup);
+        const brakeR = box(.28, .12, .06, brakeMatOff); brakeR._isBrake = true; addAt(brakeR, .62, .45, -1.72, carGroup);
+
+        // Wheels
+        function makeWheel(x, z) {
+            const g = new THREE.Group();
+            const w = new THREE.Mesh(new THREE.CylinderGeometry(.32, .32, .22, 16), wheelMat);
+            w.rotation.z = Math.PI / 2; g.add(w);
+            const rim = new THREE.Mesh(new THREE.TorusGeometry(.28, .04, 8, 16), rimMat);
+            rim.rotation.y = Math.PI / 2; g.add(rim);
+            g.position.set(x, .32, z); g.castShadow = true; carGroup.add(g); return g;
+        }
+        const wheels = [makeWheel(-.85, 1.1), makeWheel(.85, 1.1), makeWheel(-.85, -1.1), makeWheel(.85, -1.1)];
+        // Oracle sheep decal (small sphere on roof)
+        const sheep = new THREE.Mesh(new THREE.SphereGeometry(.12, 8, 8),
+            new THREE.MeshStandardMaterial({ color: 0x9f70f0, emissive: 0x3d1580, emissiveIntensity: .8 }));
+        sheep.position.set(0, 1.15, 0); carGroup.add(sheep);
+
+        scene.add(carGroup);
+
+        // Ground plane
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300),
+            new THREE.MeshStandardMaterial({ color: 0x0d1117, roughness: 1 }));
+        ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true;
+        scene.add(ground);
+
+        // ── SCENARIO OBJECTS ──
+        let sceneObjects = []; // cleared per scenario
+        function clearScene() {
+            sceneObjects.forEach(o => {
+                o.parent?.remove(o);
+                if (o.geometry) o.geometry.dispose();
+                if (o.material) o.material.dispose?.();
+            });
+            sceneObjects = [];
+        }
+        function addScene(mesh, x, y, z) { mesh.position.set(x, y, z); scene.add(mesh); sceneObjects.push(mesh); return mesh; }
+        function mk(w, h, d, mat, x, y, z) { return addScene(box(w, h, d, mat), x, y, z); }
+
+        function buildScenario0() {
+            // Straight lane 2.5m wide, 20m long
+            // Road
+            mk(6, 0.02, 22, asphaltMat, 0, 0, 0);
+            // White boundary lines (left & right)
+            mk(0.08, 0.03, 22, lineMat, -1.25, 0.01, 0);
+            mk(0.08, 0.03, 22, lineMat, 1.25, 0.01, 0);
+            // Center dash
+            for (let z = -10; z < 10; z += 2) { mk(0.05, 0.03, 0.9, yellowMat, 0, 0.01, z); }
+            // Start / End zones
+            mk(2.5, 0.03, 0.08, greenMat, 0, 0.01, 10);
+            mk(2.5, 0.03, 0.08, redMat, 0, 0.01, -10);
+            // End marker
+            const s0 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1, 8),
+                new THREE.MeshStandardMaterial({ color: 0x00ff88, emissive: 0x003322, emissiveIntensity: .8 }));
+            s0.position.set(0, .5, -10); scene.add(s0); sceneObjects.push(s0);
+            // Gravel outside
+            mk(10, 0.02, 22, new THREE.MeshStandardMaterial({ color: 0x1a1a22, roughness: 1 }), -5.5, 0, 0);
+            mk(10, 0.02, 22, new THREE.MeshStandardMaterial({ color: 0x1a1a22, roughness: 1 }), 5.5, 0, 0);
+        }
+
+        function buildScenario1() {
+            // Road (20m) with curb on right (x=4)
+            mk(10, 0.02, 22, asphaltMat, 0, 0, 0);
+            // Curb block along right side
+            mk(0.4, 0.15, 22, curbMat, 5.0, 0.07, 0);
+            mk(1, 0.08, 22, new THREE.MeshStandardMaterial({ color: 0x555555, roughness: .8 }), 5.5, 0.04, 0);
+            // Center line
+            for (let z = -10; z < 10; z += 2) { mk(0.08, 0.03, 0.9, yellowMat, -1, 0.01, z); }
+            // Stop marker (red line across road)
+            mk(5, 0.03, 0.08, redMat, 0, 0.01, -3);
+            mk(0.08, 0.03, 3, redMat, -3, 0.01, -1.5);
+            // 25cm guide line (dashed yellow)
+            for (let z = -9; z < -3; z += 1.5) { mk(2, 0.025, 0.05, yellowMat, 3.5, 0.01, z); }
+            // Sidewalk behind curb
+            mk(4, 0.06, 22, new THREE.MeshStandardMaterial({ color: 0x333340, roughness: .9 }), 7, 0.03, 0);
+            // Trees/pillars on sidewalk
+            for (let z = -8; z <= 8; z += 4) {
+                const t = new THREE.Mesh(new THREE.CylinderGeometry(.12, .15, .8, 8),
+                    new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 1 }));
+                t.position.set(7.5, .4, z); t.castShadow = true; scene.add(t); sceneObjects.push(t);
+                const g2 = new THREE.Mesh(new THREE.SphereGeometry(.4, 8, 6),
+                    new THREE.MeshStandardMaterial({ color: 0x228B22, roughness: 1 }));
+                g2.position.set(7.5, 1.2, z); g2.castShadow = true; scene.add(g2); sceneObjects.push(g2);
+            }
+        }
+
+        function buildScenario2() {
+            // Wide road
+            mk(18, 0.02, 22, asphaltMat, 0, 0, 0);
+            // Parking slot on the LEFT (x: -6 to -3, z: -2 to 4)
+            // Slot border pillars
+            const pols = [[-6, -2], [-3, -2], [-6, 4], [-3, 4]];
+            pols.forEach(([px, pz]) => {
+                const p = new THREE.Mesh(new THREE.CylinderGeometry(.12, .12, 1.2, 8), pinkMat);
+                p.position.set(px, .6, pz); p.castShadow = true; scene.add(p); sceneObjects.push(p);
+            });
+            // Slot floor mark
+            mk(3, 0.03, 6, new THREE.MeshStandardMaterial({ color: 0xf472b6, transparent: true, opacity: .15 }), -4.5, 0.01, 1);
+            // Slot lines
+            mk(0.06, 0.03, 6, pinkMat, -6, 0.015, 1);
+            mk(0.06, 0.03, 6, pinkMat, -3, 0.015, 1);
+            mk(3, 0.03, 0.06, pinkMat, -4.5, 0.015, -2);
+            mk(3, 0.03, 0.06, pinkMat, -4.5, 0.015, 4);
+            // Road markings
+            for (let z = -10; z < 10; z += 2) { mk(0.08, 0.03, 0.9, yellowMat, 1, 0.01, z); }
+            // Far wall
+            mk(18, 1.5, 0.2, new THREE.MeshStandardMaterial({ color: 0x1a2030, roughness: .9 }), 0, .75, -11);
+        }
+
+        // ── CAR PHYSICS ──
         const car = {
-            x: 0, y: 0,
-            angle: 0,  // radians, 0 = right
-            speed: 0,
-            maxSpeed: 3,
-            accel: 0.12,
-            friction: 0.88,
-            turnRate: 0.035,
-            width: 28, height: 52,
-            gear: 'P',
+            pos: new THREE.Vector3(0, 0, 8),
+            angle: 0, speed: 0, steer: 0,
+            maxSpd: 8, accel: .18, fric: .87, turnRate: .038,
+            gear: 'P', score: 100, penalties: 0,
+            gearChanges: 0, lastGear: 'P'
         };
 
-        // ── INPUT ──
         const keys = {};
         window.addEventListener('keydown', e => { keys[e.key] = true; if (e.key === ' ') e.preventDefault(); });
-        window.addEventListener('keyup', e => { keys[e.key] = false; });
+        window.addEventListener('keyup', e => delete keys[e.key]);
         window.addEventListener('keydown', e => {
             if (e.key === 'r' || e.key === 'R') resetCar();
+            if (e.key === 'c' || e.key === 'C') camMode = (camMode + 1) % 3;
         });
 
-        // ── SCENARIOS ──
-        const scenarios = [
-            {
-                name: '1. ขับตรง-ถอยตรง',
-                nameFull: 'ขับรถเดินหน้าและถอยหลังในทางตรง',
-                desc: 'ขับเดินหน้าไปจนสุดเส้น → ถอยกลับมา\nล้อต้องไม่ทับเส้นขาว 2.5 เมตร',
-                color: '#00ff88',
-            },
-            {
-                name: '2. หยุดเทียบทางเท้า',
-                nameFull: 'ขับรถเดินหน้าหยุดเทียบทางเท้า',
-                desc: 'ขับเดินหน้า หยุดขนานขอบทาง\nห่างขอบทางไม่เกิน 25 cm',
-                color: '#58a6ff',
-            },
-            {
-                name: '3. ถอยเข้าซอง',
-                nameFull: 'ถอยหลังเข้าจอดช่องว่างด้านซ้าย',
-                desc: 'ถอยหลังเข้าช่องจอด\nเปลี่ยนเกียร์ไม่เกิน 7 ครั้ง',
-                color: '#f472b6',
-            }
-        ];
-
-        // ── SCENARIO SETUP ──
-        let lane = {}; // scenario-specific boundaries
-        let touchedLine = false;
-        let gearChanges = 0;
-        let lastGear = 'D';
-        let reachedEnd = false;
-        let parkingPhase = 'forward'; // forward | reversing | done
-        let wallHits = 0;
-
-        function startScenario(idx) {
-            state.scenario = idx;
-            state.phase = 'playing';
-            state.score = 100;
-            state.penalties = 0;
-            touchedLine = false;
-            gearChanges = 0;
-            lastGear = 'D';
-            reachedEnd = false;
-            parkingPhase = 'forward';
-            wallHits = 0;
-
-            const W = canvas.width, H = canvas.height;
-            const cx = W / 2, cy = H / 2;
-
-            if (idx === 0) {
-                // Straight lane 2.5m wide, 20m long (scaled: 125px wide, 500px long)
-                lane = { x: cx - 62, y: cy - 250, w: 124, h: 500, type: 'straight' };
-                car.x = cx; car.y = cy + 200; car.angle = -Math.PI / 2; car.speed = 0;
-            } else if (idx === 1) {
-                // Road with curb at right
-                lane = {
-                    x: cx - 150, y: cy - 10, w: 300, h: 20, type: 'curb',
-                    curbX: cx + 150, curbY: cy, stopMarker: cx + 80
-                };
-                car.x = cx - 120; car.y = cy; car.angle = 0; car.speed = 0;
-            } else if (idx === 2) {
-                // Parking slot on the left
-                lane = {
-                    slotX: cx - 200, slotY: cy - 60, slotW: 80, slotH: 120, type: 'park',
-                    roadX: cx - 250, roadY: cy - 200, roadW: 300, roadH: 400
-                };
-                car.x = cx + 20; car.y = cy - 100; car.angle = Math.PI / 2; car.speed = 0;
-            }
-
-            hideOverlay();
-            updateHUD();
-            document.getElementById('scenario-label').textContent = scenarios[idx].nameFull;
-            document.getElementById(`dot-${idx}`).className = 'dot active';
-        }
+        // ── SCENARIO STATE ──
+        let scenario = -1, phase = 'menu', reachedEnd = false, parkPhase = 'approach', completed = false;
+        let camMode = 0; // 0=chase, 1=overhead, 2=hood
 
         function resetCar() {
-            if (state.scenario >= 0) startScenario(state.scenario);
+            completed = false;
+            if (scenario === 0) { car.pos.set(0, 0, 8); car.angle = 0; car.speed = 0; reachedEnd = false; }
+            else if (scenario === 1) { car.pos.set(-4, 0, 8); car.angle = 0; car.speed = 0; }
+            else if (scenario === 2) { car.pos.set(2, 0, 8); car.angle = Math.PI; car.speed = 0; parkPhase = 'approach'; }
+            car.penalties = 0; car.score = 100; car.gearChanges = 0; car.lastGear = 'P';
+            hideBanner();
+            document.getElementById('sv').textContent = '100';
+            document.getElementById('pen').textContent = '0';
         }
 
-        // ── PHYSICS ──
-        function updateCar() {
-            if (state.phase !== 'playing') return;
+        function go(idx) {
+            scenario = idx; phase = 'playing'; completed = false;
+            document.querySelector('#ov').classList.add('hide');
+            clearScene();
+            if (idx === 0) { buildScenario0(); car.pos.set(0, 0, 8); car.angle = Math.PI; reachedEnd = false; }
+            else if (idx === 1) { buildScenario1(); car.pos.set(-3, 0, 8); car.angle = Math.PI; }
+            else if (idx === 2) { buildScenario2(); car.pos.set(2, 0, 8); car.angle = Math.PI; parkPhase = 'approach'; }
+            car.speed = 0; car.penalties = 0; car.score = 100; car.gearChanges = 0; car.lastGear = 'P';
+            document.getElementById('sc-label').textContent = ['ขับตรง-ถอยตรง', 'หยุดเทียบทางเท้า', 'ถอยเข้าซอง'][idx];
+            document.getElementById(`d${idx}`).className = 'dot on';
+            document.getElementById('gc-badge').style.display = idx === 2 ? 'block' : 'none';
+            hideBanner();
+            updateHUD();
+        }
 
-            const up = keys['ArrowUp'] || keys['w'] || keys['W'];
-            const down = keys['ArrowDown'] || keys['s'] || keys['S'];
-            const left = keys['ArrowLeft'] || keys['a'] || keys['A'];
-            const right = keys['ArrowRight'] || keys['d'] || keys['D'];
-            const brake = keys[' '];
+        // expose go
+        window.go = go;
 
-            if (brake) { car.speed *= 0.7; }
-            else if (up) { car.speed += car.accel; car.gear = 'D'; }
-            else if (down) { car.speed -= car.accel * 0.8; car.gear = 'R'; }
-            else { car.speed *= car.friction; }
+        // ── PENALTY ──
+        let lastPenTime = 0;
+        function penalty(pts, msg) {
+            const now = Date.now();
+            if (now - lastPenTime < 1500) return;
+            lastPenTime = now;
+            car.penalties += pts; car.score = Math.max(0, 100 - car.penalties);
+            showBanner('❌ -' + pts + ' ' + msg, 'fail');
+            updateHUD();
+        }
+        function showBanner(msg, cls) {
+            const b = document.getElementById('banner');
+            b.textContent = msg; b.className = cls;
+            clearTimeout(b._t); b._t = setTimeout(() => hideBanner(), 2500);
+        }
+        function hideBanner() {
+            const b = document.getElementById('banner'); b.className = '';
+        }
 
-            // Gear change tracking (scenario 3)
-            if (state.scenario === 2) {
-                const g = car.speed > 0.1 ? 'D' : car.speed < -0.1 ? 'R' : lastGear;
-                if (g !== lastGear && (g === 'D' || g === 'R')) {
-                    gearChanges++;
-                    lastGear = g;
-                    if (gearChanges > 7) addPenalty(10, 'เปลี่ยนเกียร์เกิน 7 ครั้ง');
+        // ── COMPLETE ──
+        function finish(msg) {
+            if (completed) return; completed = true; phase = 'result';
+            document.getElementById(`d${scenario}`).className = 'dot dn';
+            const passed = car.score >= 60;
+            const ov = document.querySelector('#ov'); ov.classList.remove('hide');
+            ov.innerHTML = `<div class="card">
+        <h2 style="color:${passed ? '#00ff88' : '#ff4444'}">${passed ? '🎉 ผ่าน!' : '❌ ไม่ผ่าน'}</h2>
+        <p>${msg}\n\nคะแนน: ${car.score}/100 | จุดหัก: ${car.penalties}</p>
+        <button class="btn bp" onclick="go(${scenario})">🔄 ลองใหม่</button>
+        <button class="btn bs" onclick="showMenu()">📋 เมนู</button>
+    </div>`;
+        }
+        window.showMenu = () => {
+            scenario = -1; phase = 'menu'; completed = false; clearScene();
+            const ov = document.querySelector('#ov'); ov.classList.remove('hide');
+            ov.innerHTML = `<div class="card">
+        <h2 style="color:#00ff88">🚗 DLT Driving Test 3D</h2>
+        <p>เลือกท่าทดสอบตามมาตรฐานกรมการขนส่งทางบก</p>
+        <button class="btn bp" onclick="go(0)">🟩 ท่า 1: ขับตรง-ถอยตรง</button><br>
+        <button class="btn bp" onclick="go(1)">🟦 ท่า 2: หยุดเทียบทางเท้า</button><br>
+        <button class="btn bp" onclick="go(2)">🟥 ท่า 3: ถอยเข้าซอง</button>
+    </div>`;
+        };
+
+        // ── CHECK SCENARIOS ──
+        let lineTouched = false;
+        function checkScenario() {
+            if (phase !== 'playing' || completed) return;
+            const x = car.pos.x, z = car.pos.z;
+
+            if (scenario === 0) {
+                // out of lane (x boundary ±1.2)
+                if (Math.abs(x) > 1.15) {
+                    if (!lineTouched) { penalty(20, 'ล้อทับเส้น'); lineTouched = true; }
+                } else { lineTouched = false; }
+                // reached far end
+                if (z < -9.5 && !reachedEnd) {
+                    reachedEnd = true;
+                    showBanner('✅ เดินหน้าถึงปลาย! ถอยกลับ', 'pass');
+                }
+                if (reachedEnd && z > 9.5) {
+                    setTimeout(() => finish('ขับตรง-ถอยตรง สำเร็จ!'), 400);
                 }
             }
 
-            car.speed = Math.max(-car.maxSpeed * 0.6, Math.min(car.maxSpeed, car.speed));
-            if (Math.abs(car.speed) > 0.05) {
-                const dir = car.speed > 0 ? 1 : -1;
-                if (left) car.angle -= car.turnRate * dir;
-                if (right) car.angle += car.turnRate * dir;
+            if (scenario === 1) {
+                // curb is at x=4.8 — if car crosses
+                if (x > 4.6) {
+                    penalty(20, 'ปีนขอบทาง'); car.pos.x = 4.4; car.speed = 0;
+                }
+                // stopped near stop marker (z around -3) on right side (x>2)
+                if (Math.abs(car.speed) < 0.05 && x > 2 && z < -2 && z > -4.5) {
+                    const dist = (4.8 - x) * 10; // convert to cm roughly
+                    if (dist > 25) { penalty(10, `ห่างขอบทาง ${Math.round(dist)}cm`); }
+                    setTimeout(() => finish('หยุดเทียบทางเท้า สำเร็จ!'), 600);
+                }
             }
 
-            car.x += Math.cos(car.angle) * car.speed;
-            car.y += Math.sin(car.angle) * car.speed;
+            if (scenario === 2) {
+                // parking slot: x:-6 to -3, z:-2 to 4
+                const inX = x > -5.8 && x < -3.2;
+                const inZ = z > -1.8 && z < 3.8;
+                if (inX && inZ && Math.abs(car.speed) < 0.1) {
+                    setTimeout(() => finish('ถอยเข้าซองสำเร็จ!'), 600);
+                }
+                // hit wall
+                if (x < -6.2) { penalty(20, 'ชนขอบซ้าย'); car.pos.x = -6; car.speed = 0; }
+                if (x > 7) { penalty(20, 'ออกนอกถนน'); car.pos.x = 6.5; car.speed = 0; }
+            }
+        }
 
-            // Gear display
-            if (Math.abs(car.speed) < 0.05) car.gear = 'P';
-            else if (car.speed > 0) car.gear = 'D';
-            else car.gear = 'R';
+        // ── PHYSICS UPDATE ──
+        function updateCar(dt) {
+            if (phase !== 'playing') return;
+            const fwd = keys['ArrowUp'] || keys['w'] || keys['W'];
+            const bk = keys['ArrowDown'] || keys['s'] || keys['S'];
+            const lt = keys['ArrowLeft'] || keys['a'] || keys['A'];
+            const rt = keys['ArrowRight'] || keys['d'] || keys['D'];
+            const br = keys[' '];
+
+            if (br) { car.speed *= 0.75; }
+            else if (fwd) car.speed += car.accel;
+            else if (bk) car.speed -= car.accel * .8;
+            else car.speed *= car.fric;
+
+            car.speed = Math.max(-car.maxSpd * .6, Math.min(car.maxSpd, car.speed));
+
+            // Gear detection & tracking
+            const g = car.speed > 0.1 ? 'D' : car.speed < -0.1 ? 'R' : 'P';
+            if (scenario === 2 && g !== car.lastGear && (g === 'D' || g === 'R')) {
+                car.gearChanges++;
+                if (car.gearChanges > 7) penalty(10, 'เปลี่ยนเกียร์เกิน 7 ครั้ง');
+                document.getElementById('gc').textContent = car.gearChanges;
+            }
+            car.lastGear = g; car.gear = g || car.gear;
+
+            if (Math.abs(car.speed) > 0.05) {
+                const dir = car.speed > 0 ? 1 : -1;
+                if (lt) car.angle -= car.turnRate * dir * (Math.abs(car.speed) / car.maxSpd * .6 + .4);
+                if (rt) car.angle += car.turnRate * dir * (Math.abs(car.speed) / car.maxSpd * .6 + .4);
+            }
+
+            car.pos.x += Math.sin(car.angle) * car.speed * .3;
+            car.pos.z += Math.cos(car.angle) * car.speed * .3;
+            car.pos.y = 0;
+
+            // Wheel spin
+            const wSpin = car.speed * .08;
+            wheels.forEach(w => w.rotation.x -= wSpin);
+
+            // Brake lights
+            const braking = br || (Math.abs(car.speed) < 0.1);
+            brakeL.material = brakeR.material = braking ? brakeMat : brakeMatOff;
 
             checkScenario();
             updateHUD();
         }
 
-        // ── SCENARIO CHECKS ──
-        function checkScenario() {
-            const idx = state.scenario;
-            const cx = canvas.width / 2, cy = canvas.height / 2;
-
-            if (idx === 0) {
-                // Check car stays inside lane x boundary
-                const lx = lane.x, lx2 = lane.x + lane.w;
-                const carLeft = car.x - car.width / 2 * Math.abs(Math.cos(car.angle + Math.PI / 2));
-                const carRight = car.x + car.width / 2 * Math.abs(Math.cos(car.angle + Math.PI / 2));
-
-                if (carLeft < lx + 4 || carRight > lx2 - 4) {
-                    if (!touchedLine) { addPenalty(20, 'ล้อทับเส้น'); touchedLine = true; }
-                } else { touchedLine = false; }
-
-                // Check if reached far end (forward)
-                if (car.y < lane.y + 40 && !reachedEnd) {
-                    reachedEnd = true;
-                    showBanner('✅ เดินหน้าถึงปลายทาง! ถอยหลังกลับ', 'pass');
-                }
-                // Check if returned to start (reverse)
-                if (reachedEnd && car.y > lane.y + lane.h - 60) {
-                    setTimeout(() => scenarioComplete('ผ่าน! ขับตรง-ถอยตรง สำเร็จ'), 500);
-                }
-            }
-
-            if (idx === 1) {
-                // Check if car stopped near curb
-                if (Math.abs(car.speed) < 0.1 && car.x > lane.stopMarker - 20) {
-                    const distFromCurb = Math.abs((car.y + car.height / 2) - lane.curbY);
-                    if (distFromCurb > 25) {
-                        addPenalty(10, `ห่างขอบทาง ${Math.round(distFromCurb)}px เกิน 25cm`);
-                    }
-                    setTimeout(() => scenarioComplete('หยุดเทียบทางเท้า สำเร็จ'), 600);
-                }
-                // Curb collision
-                if (car.y > lane.curbY - 14) {
-                    addPenalty(20, 'ปีนขอบทาง'); car.y = lane.curbY - 14; car.speed = 0;
-                }
-            }
-
-            if (idx === 2) {
-                // Check if car is fully inside parking slot
-                const s = lane;
-                const inX = car.x > s.slotX + 10 && car.x < s.slotX + s.slotW - 10;
-                const inY = car.y > s.slotY + 10 && car.y < s.slotY + s.slotH - 10;
-                if (inX && inY && Math.abs(car.speed) < 0.15 && car.gear === 'P') {
-                    setTimeout(() => scenarioComplete('ถอยเข้าซองสำเร็จ!'), 500);
-                }
-            }
-        }
-
-        function addPenalty(pts, reason) {
-            state.penalties += pts;
-            state.score = Math.max(0, 100 - state.penalties);
-            showBanner(`❌ -${pts} ${reason}`, 'fail');
-        }
-
-        function scenarioComplete(msg) {
-            state.phase = 'result';
-            state.scenarioDone[state.scenario] = true;
-            document.getElementById(`dot-${state.scenario}`).className = 'dot done';
-
-            const passed = state.score >= 60;
-            showOverlay(
-                passed ? '🎉 ผ่านแล้ว!' : '❌ ไม่ผ่าน',
-                `${msg}\n\nคะแนน: ${state.score}/100 จุดหัก: ${state.penalties}`,
-                passed,
-            );
-        }
-
-        // ── UI ──
         function updateHUD() {
-            document.getElementById('speed-val').textContent = Math.round(Math.abs(car.speed) * 20);
-            document.getElementById('gear-val').textContent = car.gear;
-            document.getElementById('score-val').textContent = state.score;
-            document.getElementById('penalty-val').textContent = state.penalties;
+            document.getElementById('spd').textContent = Math.round(Math.abs(car.speed) * 20);
+            document.getElementById('gr').textContent = car.gear;
+            document.getElementById('sv').textContent = car.score;
+            document.getElementById('pen').textContent = car.penalties;
         }
 
-        function showBanner(msg, type) {
-            const b = document.getElementById('result-banner');
-            b.textContent = msg;
-            b.className = `result-banner show ${type}`;
-            clearTimeout(b._t);
-            b._t = setTimeout(() => b.className = 'result-banner', 2500);
-        }
-
-        function showOverlay(title, body, pass) {
-            const o = document.getElementById('msg-overlay');
-            const allDone = state.scenarioDone.every(v => v);
-            document.getElementById('msg-title').textContent = title;
-            document.getElementById('msg-title').style.color = pass ? 'var(--accent)' : 'var(--danger)';
-            document.getElementById('msg-body').textContent = body;
-            o.innerHTML = `
-        <div id="msg-title" style="font-size:2rem;font-weight:700;margin-bottom:.5rem;color:${pass ? 'var(--accent)' : 'var(--danger)'}">${title}</div>
-        <div id="msg-body" style="color:var(--muted);font-size:.95rem;margin-bottom:1.5rem;white-space:pre-line;line-height:1.7">${body}</div>
-        <button class="btn-game btn-primary" onclick="startScenario(${state.scenario})">🔄 ลองอีกครั้ง</button>
-        <button class="btn-game btn-secondary" onclick="showMenu()">📋 เมนูหลัก</button>
-        ${allDone ? '<br><button class="btn-game btn-primary" onclick="showFinalResult()">🏆 ดูผลรวม</button>' : ''}
-    `;
-            o.className = 'show';
-        }
-
-        function hideOverlay() { document.getElementById('msg-overlay').className = ''; }
-
-        function showMenu() {
-            state.scenario = -1; state.phase = 'menu';
-            document.getElementById('msg-overlay').innerHTML = `
-        <div id="msg-title" style="font-size:1.5rem;font-weight:700;margin-bottom:.5rem">🐑 DLT Driving Test</div>
-        <div id="msg-body" style="color:var(--muted);font-size:.9rem;margin-bottom:1.5rem">เลือกท่าทดสอบที่ต้องการฝึก<br>ตามมาตรฐานกรมการขนส่งทางบก</div>
-        <button class="btn-game btn-primary" onclick="startScenario(0)">🟩 ท่า 1: ขับตรง-ถอยตรง</button><br>
-        <button class="btn-game btn-primary" onclick="startScenario(1)">🟦 ท่า 2: หยุดเทียบทางเท้า</button><br>
-        <button class="btn-game btn-primary" onclick="startScenario(2)">🟥 ท่า 3: ถอยเข้าซอง</button>
-    `;
-            document.getElementById('msg-overlay').className = 'show';
-            document.getElementById('scenario-label').textContent = 'เลือกท่าทดสอบ';
-        }
-
-        function showFinalResult() {
-            const allPassed = state.scenarioDone.every(v => v);
-            document.getElementById('msg-overlay').innerHTML = `
-        <div style="font-size:2rem;margin-bottom:.5rem">🏆 ผลการสอบรวม</div>
-        <div style="font-size:3rem;margin:.5rem 0;color:var(--accent)">${state.score}</div>
-        <div style="color:var(--muted);margin-bottom:1.5rem">คะแนนรวม / 100</div>
-        <div style="color:var(--accent);font-size:1.1rem;margin-bottom:1.5rem">${state.score >= 60 ? '🎉 ผ่านการสอบ!' : '❌ ไม่ผ่าน — ลองอีกครั้ง'}</div>
-        <button class="btn-game btn-primary" onclick="showMenu()">🔄 เริ่มใหม่</button>
-    `;
-        }
-
-        // ── 3D CAMERA ──
-        // Top-down with slight perspective
-        let camX = 0, camY = 0;
+        // ── CAMERA ──
+        const camTarget = new THREE.Vector3();
+        const camPos = new THREE.Vector3();
         function updateCamera() {
-            camX += (car.x - canvas.width / 2 - camX) * 0.1;
-            camY += (car.y - canvas.height / 2 - camY) * 0.1;
-        }
+            carGroup.position.copy(car.pos);
+            carGroup.rotation.y = car.angle;
 
-        // ── DRAW ──
-        function drawScenario0() {
-            const l = lane;
-            // Road surface
-            ctx.fillStyle = '#1a2030';
-            ctx.fillRect(l.x - 40, l.y - 20, l.w + 80, l.h + 40);
-            // Lane boundary white lines
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(l.x, l.y, l.w, l.h);
-            // Center dashed line
-            ctx.strokeStyle = 'rgba(255,255,100,0.4)';
-            ctx.setLineDash([15, 10]);
-            ctx.beginPath(); ctx.moveTo(l.x + l.w / 2, l.y); ctx.lineTo(l.x + l.w / 2, l.y + l.h);
-            ctx.stroke(); ctx.setLineDash([]);
-            // Start/End markers
-            ctx.fillStyle = 'rgba(0,255,136,0.3)';
-            ctx.fillRect(l.x, l.y, l.w, 20);
-            ctx.fillRect(l.x, l.y + l.h - 20, l.w, 20);
-            ctx.fillStyle = '#00ff88';
-            ctx.font = '600 13px "Noto Sans Thai"';
-            ctx.textAlign = 'center';
-            ctx.fillText('END', l.x + l.w / 2, l.y + 14);
-            ctx.fillText('START', l.x + l.w / 2, l.y + l.h - 7);
-            // Lane width label
-            ctx.fillStyle = 'rgba(255,255,255,0.4)';
-            ctx.font = '11px "JetBrains Mono"';
-            ctx.fillText('← 2.5 m →', l.x + l.w / 2, l.y - 5);
-        }
-
-        function drawScenario1() {
-            const l = lane;
-            const W = canvas.width, H = canvas.height;
-            // Road
-            ctx.fillStyle = '#1a2030';
-            ctx.fillRect(l.x - 20, l.y - 80, l.w + 40, l.h + 160);
-            // Curb (grey band at y=l.curbY)
-            ctx.fillStyle = '#555';
-            ctx.fillRect(l.x - 20, l.curbY, l.w + 40, 12);
-            // Curb top
-            const grad = ctx.createLinearGradient(0, l.curbY, 0, l.curbY + 12);
-            grad.addColorStop(0, '#aaa'); grad.addColorStop(1, '#555');
-            ctx.fillStyle = grad;
-            ctx.fillRect(l.x - 20, l.curbY, l.w + 40, 12);
-            // Stop marker
-            ctx.strokeStyle = '#ff4444';
-            ctx.lineWidth = 3; ctx.setLineDash([8, 6]);
-            ctx.beginPath(); ctx.moveTo(l.stopMarker, l.curbY - 80); ctx.lineTo(l.stopMarker, l.curbY);
-            ctx.stroke(); ctx.setLineDash([]);
-            ctx.fillStyle = '#ff4444';
-            ctx.font = '12px "JetBrains Mono"';
-            ctx.textAlign = 'center';
-            ctx.fillText('STOP', l.stopMarker, l.curbY - 85);
-            // 25cm guide
-            ctx.strokeStyle = 'rgba(255,215,0,0.5)';
-            ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
-            ctx.beginPath(); ctx.moveTo(l.x - 20, l.curbY - 25); ctx.lineTo(l.stopMarker + 40, l.curbY - 25);
-            ctx.stroke(); ctx.setLineDash([]);
-            ctx.fillStyle = 'rgba(255,215,0,0.7)';
-            ctx.font = '11px "JetBrains Mono"';
-            ctx.fillText('≤ 25 cm', l.x + 30, l.curbY - 28);
-            // Road markings
-            ctx.fillStyle = '#ffd700';
-            ctx.fillRect(l.x, l.curbY - 82, 60, 4);
-            ctx.fillRect(l.x, l.curbY - 40, 40, 4);
-        }
-
-        function drawScenario2() {
-            const s = lane;
-            // Road area
-            ctx.fillStyle = '#1a2030';
-            ctx.fillRect(s.roadX, s.roadY, s.roadW, s.roadH);
-            // Parking slot outline
-            ctx.strokeStyle = '#ff4444';
-            ctx.lineWidth = 3;
-            ctx.fillStyle = 'rgba(244,114,182,0.08)';
-            ctx.fillRect(s.slotX, s.slotY, s.slotW, s.slotH);
-            ctx.strokeRect(s.slotX, s.slotY, s.slotW, s.slotH);
-            // Slot label
-            ctx.fillStyle = '#f472b6';
-            ctx.font = '600 12px "JetBrains Mono"';
-            ctx.textAlign = 'center';
-            ctx.fillText('SLOT', s.slotX + s.slotW / 2, s.slotY + s.slotH / 2);
-            // Pillars
-            ctx.fillStyle = '#f472b6';
-            [[s.slotX, s.slotY], [s.slotX + s.slotW, s.slotY], [s.slotX, s.slotY + s.slotH], [s.slotX + s.slotW, s.slotY + s.slotH]].forEach(([px, py]) => {
-                ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
-            });
-            // Gear counter
-            ctx.fillStyle = gearChanges > 7 ? '#ff4444' : '#ffd700';
-            ctx.font = '700 14px "JetBrains Mono"';
-            ctx.textAlign = 'left';
-            ctx.fillText(`GEAR CHANGES: ${gearChanges}/7`, s.roadX + 10, s.roadY + 20);
-            // Parking maneuver arrow hint
-            ctx.strokeStyle = 'rgba(244,114,182,0.3)';
-            ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
-            ctx.beginPath();
-            ctx.moveTo(car.x, car.y);
-            ctx.bezierCurveTo(car.x - 50, car.y + 40, s.slotX + s.slotW + 20, s.slotY, s.slotX + s.slotW / 2, s.slotY + s.slotH / 2);
-            ctx.stroke(); ctx.setLineDash([]);
-        }
-
-        function drawCar() {
-            ctx.save();
-            ctx.translate(car.x, car.y);
-            ctx.rotate(car.angle + Math.PI / 2);
-            const w = car.width, h = car.height;
-
-            // Shadow
-            ctx.fillStyle = 'rgba(0,0,0,0.4)';
-            ctx.beginPath(); ctx.ellipse(3, 5, w / 2, h / 3, 0, 0, Math.PI * 2); ctx.fill();
-
-            // Body
-            const bodyGrad = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
-            bodyGrad.addColorStop(0, '#2a2a3a'); bodyGrad.addColorStop(1, '#1a1a2a');
-            ctx.fillStyle = bodyGrad;
-            ctx.beginPath();
-            ctx.roundRect(-w / 2, -h / 2, w, h, 6);
-            ctx.fill();
-
-            // Oracle stripe
-            ctx.fillStyle = '#6e40c9';
-            ctx.fillRect(-w / 2 + 3, -h / 2 + 4, w - 6, 6);
-
-            // Windshield
-            ctx.fillStyle = 'rgba(100,200,255,0.3)';
-            ctx.fillRect(-w / 2 + 5, -h / 2 + 12, w - 10, 14);
-
-            // Headlights
-            ctx.fillStyle = car.speed > 0 ? '#ffffaa' : 'rgba(255,255,100,0.3)';
-            ctx.fillRect(-w / 2 + 4, -h / 2 + 2, 10, 5);
-            ctx.fillRect(w / 2 - 14, -h / 2 + 2, 10, 5);
-
-            // Brake lights
-            ctx.fillStyle = Math.abs(car.speed) < 0.1 ? '#ff4444' : 'rgba(255,68,68,0.3)';
-            ctx.fillRect(-w / 2 + 4, h / 2 - 7, 10, 5);
-            ctx.fillRect(w / 2 - 14, h / 2 - 7, 10, 5);
-
-            // Reverse lights
-            if (car.speed < -0.1) {
-                ctx.fillStyle = 'rgba(255,255,200,0.9)';
-                ctx.fillRect(-w / 2 + 4, h / 2 - 7, 10, 5);
-                ctx.fillRect(w / 2 - 14, h / 2 - 7, 10, 5);
-            }
-
-            // Speed lines when fast
-            if (Math.abs(car.speed) > 1.5) {
-                ctx.strokeStyle = `rgba(0,255,136,${Math.min(0.6, (Math.abs(car.speed) - 1.5) / 3)})`;
-                ctx.lineWidth = 1.5;
-                [-8, 0, 8].forEach(ox => {
-                    const dir = car.speed > 0 ? 1 : -1;
-                    ctx.beginPath();
-                    ctx.moveTo(ox, dir * h / 2);
-                    ctx.lineTo(ox, dir * (h / 2 + 15));
-                    ctx.stroke();
-                });
-            }
-            ctx.restore();
-        }
-
-        // ── GRID BACKGROUND ──
-        function drawGrid() {
-            const offsetX = (-camX) % 60;
-            const offsetY = (-camY) % 60;
-            ctx.strokeStyle = 'rgba(110,64,201,0.1)';
-            ctx.lineWidth = 1;
-            for (let x = offsetX; x < canvas.width; x += 60) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-            }
-            for (let y = offsetY; y < canvas.height; y += 60) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            if (camMode === 0) {
+                // Chase cam
+                const behind = new THREE.Vector3(Math.sin(car.angle) * -8, 4, Math.cos(car.angle) * -8);
+                camPos.lerp(car.pos.clone().add(behind), .08);
+                camTarget.lerp(car.pos.clone().add(new THREE.Vector3(0, 0.5, 0)), .15);
+                camera.position.copy(camPos);
+                camera.lookAt(camTarget);
+            } else if (camMode === 1) {
+                // Overhead
+                camera.position.set(car.pos.x, 22, car.pos.z + 2);
+                camera.lookAt(car.pos);
+            } else {
+                // Hood cam
+                const hood = car.pos.clone().add(new THREE.Vector3(Math.sin(car.angle) * .5, 1.1, Math.cos(car.angle) * .5));
+                camera.position.copy(hood);
+                const lookAt = car.pos.clone().add(new THREE.Vector3(Math.sin(car.angle) * 10, 1, Math.cos(car.angle) * 10));
+                camera.lookAt(lookAt);
             }
         }
 
-        // ── MAIN LOOP ──
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Background
-            ctx.fillStyle = '#0a0f17';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            drawGrid();
-
-            // Camera transform
-            ctx.save();
-            ctx.translate(-camX, -camY);
-
-            if (state.phase === 'playing' || state.phase === 'result') {
-                if (state.scenario === 0) drawScenario0();
-                else if (state.scenario === 1) drawScenario1();
-                else if (state.scenario === 2) drawScenario2();
-                drawCar();
-            }
-
-            ctx.restore();
-
-            // Mini compass
-            if (state.phase === 'playing') {
-                ctx.save();
-                ctx.translate(canvas.width - 60, canvas.height - 60);
-                ctx.fillStyle = 'rgba(22,27,34,0.8)';
-                ctx.beginPath(); ctx.arc(0, 0, 28, 0, Math.PI * 2); ctx.fill();
-                ctx.strokeStyle = 'rgba(0,255,136,0.3)'; ctx.lineWidth = 1;
-                ctx.beginPath(); ctx.arc(0, 0, 28, 0, Math.PI * 2); ctx.stroke();
-                ctx.rotate(car.angle + Math.PI / 2);
-                ctx.fillStyle = '#00ff88';
-                ctx.beginPath(); ctx.moveTo(0, -20); ctx.lineTo(5, 10); ctx.lineTo(-5, 10); ctx.closePath(); ctx.fill();
-                ctx.fillStyle = '#ff4444';
-                ctx.beginPath(); ctx.moveTo(0, 20); ctx.lineTo(4, -8); ctx.lineTo(-4, -8); ctx.closePath(); ctx.fill();
-                ctx.restore();
-            }
+        // ── AMBIENT PARTICLES ──
+        const partGeo = new THREE.BufferGeometry();
+        const partPos = [];
+        for (let i = 0; i < 200; i++) {
+            partPos.push((Math.random() - .5) * 60, Math.random() * 3, (Math.random() - .5) * 60);
         }
+        partGeo.setAttribute('position', new THREE.Float32BufferAttribute(partPos, 3));
+        const parts = new THREE.Points(partGeo, new THREE.PointsMaterial({ color: 0x6e40c9, size: .12, transparent: true, opacity: .4 }));
+        scene.add(parts);
 
-        function loop() {
-            if (state.phase === 'playing') {
-                updateCar();
-                updateCamera();
-            }
-            draw();
+        // ── RENDER LOOP ──
+        let prev = 0;
+        function loop(ts) {
             requestAnimationFrame(loop);
+            const dt = Math.min(ts - prev, 50) / 1000; prev = ts;
+            parts.rotation.y += .0002;
+            updateCar(dt);
+            updateCamera();
+            renderer.render(scene, camera);
         }
-
-        // Center cam on car initially
-        camX = car.x - canvas.width / 2;
-        camY = car.y - canvas.height / 2;
-        loop();
+        // Init camera position
+        camPos.set(0, 6, 14);
+        camera.position.copy(camPos);
+        camera.lookAt(0, 0, 0);
+        requestAnimationFrame(loop);
     </script>
 </body>
 
